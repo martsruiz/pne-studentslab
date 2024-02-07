@@ -18,3 +18,5 @@ def print_filename1(filename):
     return first_line
 f = print_filename1("sequences/RNU6_269P.txt")
 print("First line of the RNU6_269P.txt file: ", str(f))
+
+
