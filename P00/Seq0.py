@@ -14,7 +14,7 @@ def seq_read_fasta(filename):
 def seq_len(seq):
     return len(seq)
 
-def seq_count(seq, base):
+def seq_count_base(seq, base):
     count = 0
     for i in seq:
         if i == base:
@@ -45,9 +45,11 @@ def seq_complement(seq) :
            "T": "A",
            "C": "G",
            "G": "C"}
+    tmp = ""
     for i in short_sequence:
         if i in dic:
-            print(dic[i], end="")
+            tmp += dic[i]
+    return tmp
 
 
 
