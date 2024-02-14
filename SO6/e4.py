@@ -1,10 +1,12 @@
 import termcolor
 
+
 class Seq:
     """A class for representing sequences"""
+
     def __init__(self, strbases):
 
-        valid_sequence = ["A","C","T","G"]
+        valid_sequence = ["A", "C", "T", "G"]
         for i in strbases:
             if i not in valid_sequence:
                 strbases = "ERROR"
@@ -16,6 +18,7 @@ class Seq:
             print("New sequence created!")
 
         self.strbases = strbases
+
     def __str__(self):
         """Method called when the object is being printed"""
         # -- We just return the string with the sequence
@@ -30,9 +33,10 @@ def print_seqs(seq_list, colour):
     for i, seq in enumerate(seq_list):
         termcolor.cprint(f"Index: {i}, Length: {seq.len()}, Sequence: {seq}", colour)
 
+
 def generate_seqs(pattern, number):
     seq_list = []
-    for i in range(1, number +1):
+    for i in range(1, number + 1):
         seq_list.append(Seq(pattern * i))
     return seq_list
 
