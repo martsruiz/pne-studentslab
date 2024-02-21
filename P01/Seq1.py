@@ -1,11 +1,11 @@
-
+from pathlib import Path
 class Seq:
     """A class for representing sequences"""
 
     def __init__(self, strbases = None):
         # Initialize the sequence with the value
         # passed as argument when creating the object
-        valid_basis = ["A","C", "T","G"]
+
         if strbases == None:
             self.strbases = "NULL"
             print("NULL sequence created!")
@@ -61,6 +61,40 @@ class Seq:
                 if a in count_dic:
                     count_dic[a] += 1
         return count_dic
+
+    def reverse(self) :
+        if self.strbases == "ERROR":
+            reverse_seq = self.strbases
+        elif self.strbases == "NULL":
+            reverse_seq = self.strbases
+        else:
+            reverse_seq = self.strbases[::-1]
+        return reverse_seq
+
+
+    def complement(self):
+        dic = {"A": "T",
+           "T": "A",
+           "C": "G",
+           "G": "C"}
+
+        tmp = ""
+        if self.strbases == "ERROR" or self.strbases == "NULL":
+            tmp = self.strbases
+        else:
+            for i in self.strbases:
+                if i in dic:
+                    tmp += dic[i]
+        return tmp
+
+
+
+    def read_fasta(self, filename):
+        file_contents = Path(filename).read_text()
+        first_line = file_contents.find("\n")
+        new_sequence = file_contents[first_line:]
+        self.strbases = new_sequence.replace("\n", "")
+        return  self.strbases
 
 
 # --- Main program
