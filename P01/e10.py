@@ -5,4 +5,5 @@ for i in genes:
     file = sequence + str(i) + ".txt"
     s = Seq()
     s.read_fasta(file)
+    print(s)
 
