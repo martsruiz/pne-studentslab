@@ -33,21 +33,16 @@ class Seq:
         return  length
 
     def count_base(self, base):
-        count_A = 0
-        count_G = 0
-        count_T = 0
-        count_C = 0
-        for i in base:
-            if i == "A":
-                count_A += 1
-            elif i == "C":
-                count_C += 1
-            elif i == "G":
-                count_G += 1
-            elif i == "T":
-                count_T += 1
+        if self.strbases == "ERROR" or self.strbases == "NULL":
+            seq = ""
+        else:
+            seq = self.strbases
+        count = 0
+        for i in seq:
+            if i == base:
+                count += 1
 
-        return count_A, count_T, count_G, count_C
+        return count
 
 
     def count(self):
