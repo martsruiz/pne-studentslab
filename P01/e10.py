@@ -1,6 +1,6 @@
 from Seq1 import Seq
 print("-----| Practice 1, Exercise 10 |------")
-genes = ["U5", "ADA", "FXN", "FRAT1"]
+genes = ["U5", "ADA", "FXN", "FRAT1", "RNU6_269P"]
 sequence = "../sequences/"
 for i in genes:
     file = sequence + str(i) + ".txt"
