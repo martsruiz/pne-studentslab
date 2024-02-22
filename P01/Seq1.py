@@ -47,8 +47,7 @@ class Seq:
             elif i == "T":
                 count_T += 1
 
-
-
+        return count_A, count_T, count_G, count_C
 
 
     def count(self):
