@@ -19,6 +19,7 @@ def get_sequence(gene):
     return s.read_fasta(file_path)
 
 c = Client(IP, PORT)
+
 print(c)
 
 
