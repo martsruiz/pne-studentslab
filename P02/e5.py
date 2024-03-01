@@ -39,6 +39,7 @@ def get_fragments(sequences):
             fragments = ""
         if rounds == 5:
             break
+n = 0
 
 
 print(f"Gene {genes}: {sequences}")
