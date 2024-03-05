@@ -6,7 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/P01" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/P02" isTestSource="false" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Python 3.9 (pne-studentslab)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
