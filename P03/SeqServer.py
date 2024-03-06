@@ -1,4 +1,5 @@
 import socket
+from Seq1 import Seq
 class SeqServer():
     def __init__(self, msg =None):
 
@@ -33,11 +34,11 @@ class SeqServer():
                 msg = clientsocket.recv(2048).decode("utf-8")
 
                 print("Message from client: {}".format(msg))
-                message = self.return_response(str(msg)) + "\n"
+                message = self.return_response(str(msg))
 
                 # Send the message
+                send_bytes = str(message).encode("utf-8")
 
-                send_bytes = str.encode(message)
                 # We must write bytes, not a string
                 clientsocket.send(send_bytes)
                 clientsocket.close()
@@ -54,6 +55,10 @@ class SeqServer():
             return self.ping_response()
         if msg.startswith("GET"):
             return self.get_response(msg)
+        if msg.startswith(("INFO")):
+            return self.info_response(msg)
+        if msg.startswith("COMP"):
+            return  self.comp_response(msg)
 
     def ping_response(self):
         print("PING command!")
@@ -70,6 +75,34 @@ class SeqServer():
         print("GET")
         print(n)
         return n
+
+
+
+
+
+    def info_response(self, msg):
+        seq = msg.replace("INFO", "").strip()
+        print("INFO")
+        s1 = Seq(str(seq))
+        length = s1.len()
+        base_counts = s1.count()
+
+        print(f"Sequence: {s1}\nTotal length: {length}")
+
+        for base, count in base_counts.items():
+            percentage = round((count / length) * 100,2)
+            print(f"{base}: {count} ({percentage} %)")
+        return s1
+
+    def comp_response(self, msg):
+        seq = msg.replace("COMP", "").strip()
+        print("COMP")
+        s = Seq(str(seq))
+        complement = s.complement()
+        print(complement)
+
+        return complement
+
 
 
 
