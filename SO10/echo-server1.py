@@ -1,8 +1,9 @@
 import socket
+import termcolor
 
 # Configure the Server's IP and PORT
-PORT = 8080
-IP = "212.128.255.102" # the IP address depends on the machine running the server
+PORT = 8081
+IP = "212.128.255.150" # the IP address depends on the machine running the server
 
 # -- Step 1: create the socket
 ls = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -21,7 +22,7 @@ while True:
     print("A client has connected to the server!")
     print(f"Client {address}")
     msg = rs.recv(2048).decode("utf-8")
-    print("Message received" + msg)
+    print("Message received: " + termcolor.colored(msg, "yellow"))
 
     rs.send(msg.encode())
     # -- Close the client socket
