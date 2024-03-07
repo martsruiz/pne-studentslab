@@ -4,7 +4,7 @@ class SeqServer():
     def __init__(self, msg =None):
 
         # Configure the Server's IP and PORT
-        PORT = 1234
+        PORT = 12345
         IP = "127.0.0.1"  # "192.168.1.39" "212.128.255.90" # it depends on the machine the server is running
         MAX_OPEN_REQUESTS = 5
 
@@ -51,14 +51,18 @@ class SeqServer():
             serversocket.close()
 
     def return_response (self, msg):
-        if msg.startswith("PING"):
+        if str("PING") in msg:
             return self.ping_response()
-        if msg.startswith("GET"):
+        if str("GET") in msg:
             return self.get_response(msg)
-        if msg.startswith(("INFO")):
+        if str("INFO") in msg:
             return self.info_response(msg)
-        if msg.startswith("COMP"):
-            return  self.comp_response(msg)
+        if str("COMP") in msg:
+            return self.comp_response(msg)
+        if str("REV") in msg:
+            return self.rev_response(msg)
+        if str("GENE") in msg:
+            return self.gene_response(msg)
 
     def ping_response(self):
         print("PING command!")
@@ -87,12 +91,18 @@ class SeqServer():
         length = s1.len()
         base_counts = s1.count()
 
-        print(f"Sequence: {s1}\nTotal length: {length}")
+        answer = (f"Sequence: {s1}\nTotal length: {length}\n")
+
 
         for base, count in base_counts.items():
             percentage = round((count / length) * 100,2)
-            print(f"{base}: {count} ({percentage} %)")
-        return s1
+            answer +=  (f"{base}: {count} ({percentage} %)\n")
+        print (answer)
+
+        return answer
+
+
+
 
     def comp_response(self, msg):
         seq = msg.replace("COMP", "").strip()
@@ -102,6 +112,29 @@ class SeqServer():
         print(complement)
 
         return complement
+
+    def rev_response(selfsel, msg):
+        new_seq = msg.replace("REV", "").strip()
+        print("REV")
+        s = Seq(str(new_seq))
+        reverse = s.reverse()
+        print(reverse)
+        return reverse
+
+    def gene_response(self, msg):
+        new_msg = msg.replace("GENE", "").strip()
+        sequence = "../sequences/"
+        file = sequence + str(new_msg) + ".txt"
+        print("GENE")
+        s = Seq()
+        print(s.read_fasta(file))
+        return s.read_fasta(file)
+
+
+
+
+
+
 
 
 
