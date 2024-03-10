@@ -30,7 +30,7 @@ class Seq:
             length = 0
         else:
             length = len(self.strbases)
-        return  length
+        return length
 
     def count_base(self, base):
         if self.strbases == "ERROR" or self.strbases == "NULL":
