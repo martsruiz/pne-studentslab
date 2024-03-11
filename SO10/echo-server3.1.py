@@ -4,7 +4,7 @@ import termcolor
 # Configure the Server's IP and PORT
 PORT = 8080
 IP = "212.128.255.97"  # the IP address depends on the machine running the server
-
+clients_list = []
 # Initialize connection counter
 connection_counter = 0
 
@@ -44,6 +44,7 @@ while True:
 
         print("A client has connected to the server!")
         connection_counter += 1
+        clients_list.append(client_ip_port)
 
         # -- Read the message from the client
         # -- The received message is in raw bytes
@@ -54,17 +55,19 @@ while True:
         msg = msg_raw.decode()
 
         # -- Print the received message
-        print(f"CONNECTION {connection_counter}: CLIENT IP, PORT: {client_ip_port}\n Message received: " + termcolor.colored(msg, "green"))
+
+        print(f"CONNECTION {connection_counter}: CLIENT IP, PORT: {client_ip_port}\n Message received: " + termcolor.colored (msg, "green"))
 
         # -- Send a response message to the client
-        response = f"CONNECTION {connection_counter}: ECHO: {msg}"
+        response = f" ECHO: {msg}"
 
         # -- The message has to be encoded into bytes
         cs.send(response.encode())
 
         # -- Close the data socket
         cs.close()
+        if connection_counter == 5:
+            for a, i in enumerate(clients_list, start=0):
+                print(f"Client {a}: {i} ")
 # -- Close the server socket
 ls.close()
-
-

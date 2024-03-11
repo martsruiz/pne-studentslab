@@ -3,7 +3,7 @@ import termcolor
 
 # Configure the Server's IP and PORT
 PORT = 8081
-IP = "192.168.1.40" # the IP address depends on the machine running the server
+IP = "212.128.255.97" # the IP address depends on the machine running the server
 
 # -- Step 1: create the socket
 ls = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -51,7 +51,6 @@ while True:
         msg = msg_raw.decode()
 
         # -- Print the received message
-        termcolor.cprint(f"Message received: {msg}", "green")
         print("Message received: " + termcolor.colored(msg, "green"))
 
         # -- Send a response message to the client

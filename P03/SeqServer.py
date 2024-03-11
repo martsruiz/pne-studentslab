@@ -1,5 +1,6 @@
 import socket
 from Seq1 import Seq
+import termcolor
 class SeqServer():
     def __init__(self, msg =None):
 
@@ -8,11 +9,12 @@ class SeqServer():
         IP = "127.0.0.1"  # "192.168.1.39" "212.128.255.90" # it depends on the machine the server is running
         MAX_OPEN_REQUESTS = 5
 
-        # Counting the number of connections
-        number_con = 0
+
 
         # create an INET, STREAMing socket
         serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        print("SEQ Server configured!")
+
         try:
             serversocket.bind((IP, PORT))
             # become a server socket
@@ -24,16 +26,10 @@ class SeqServer():
                 print("Waiting for connections at {}, {} ".format(IP, PORT))
                 (clientsocket, address) = serversocket.accept()
 
-                # Another connection!e
-                number_con += 1
-
-                # Print the connection number
-                print("CONNECTION: {}. From the IP: {}".format(number_con, address))
 
                 # Read the message from the client, if any
                 msg = clientsocket.recv(2048).decode("utf-8")
 
-                print("Message from client: {}".format(msg))
                 message = self.return_response(str(msg))
 
                 # Send the message
@@ -65,7 +61,7 @@ class SeqServer():
             return self.gene_response(msg)
 
     def ping_response(self):
-        print("PING command!")
+        termcolor.cprint("PING command!", "green")
         print("OK!")
         return "OK!\n"
 
@@ -76,9 +72,11 @@ class SeqServer():
                 n = list_seq[int(i)]
             else:
                 pass
-        print("GET")
+        print(termcolor.colored("GET", "green"))
         print(n)
-        return n
+
+        j = f" {n}\n"
+        return j
 
 
 
@@ -86,7 +84,7 @@ class SeqServer():
 
     def info_response(self, msg):
         seq = msg.replace("INFO", "").strip()
-        print("INFO")
+        print(termcolor.colored("INFO", "green"))
         s1 = Seq(str(seq))
         length = s1.len()
         base_counts = s1.count()
@@ -95,7 +93,7 @@ class SeqServer():
 
 
         for base, count in base_counts.items():
-            percentage = round((count / length) * 100,2)
+            percentage = round((count / length) * 100,1)
             answer +=  (f"{base}: {count} ({percentage} %)\n")
         print (answer)
 
@@ -106,29 +104,32 @@ class SeqServer():
 
     def comp_response(self, msg):
         seq = msg.replace("COMP", "").strip()
-        print("COMP")
+        print(termcolor.colored("COMP", "green"))
         s = Seq(str(seq))
         complement = s.complement()
         print(complement)
+        c = complement + "\n"
 
-        return complement
+        return c
 
     def rev_response(selfsel, msg):
         new_seq = msg.replace("REV", "").strip()
-        print("REV")
+        print(termcolor.colored("REV", "green"))
         s = Seq(str(new_seq))
         reverse = s.reverse()
         print(reverse)
-        return reverse
+        r = reverse + "\n"
+        return r
 
     def gene_response(self, msg):
         new_msg = msg.replace("GENE", "").strip()
         sequence = "../sequences/"
         file = sequence + str(new_msg) + ".txt"
-        print("GENE")
+        print(termcolor.colored("GENE", "green"))
         s = Seq()
         print(s.read_fasta(file))
-        return s.read_fasta(file)
+        with_space = s.read_fasta(file) + "\n"
+        return with_space
 
 
 

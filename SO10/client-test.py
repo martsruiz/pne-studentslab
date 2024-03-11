@@ -1,7 +1,7 @@
 from Client0 import Client
 import termcolor
-IP = "192.168.1.40"
-PORT = 8081
+IP = "212.128.255.97"
+PORT = 8080
 
 c = Client(IP, PORT)
 for i in range(5):
@@ -9,5 +9,5 @@ for i in range(5):
     response = c.talk(msg)
 
     print(f"To server: " + termcolor.colored(msg, "blue"))
-    print (f" From server: "+ termcolor.colored("ECHO: "+ response,  "green"))
+    print (f" From server:"+ termcolor.colored( response,  "green"))
 
