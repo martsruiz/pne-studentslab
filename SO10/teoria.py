@@ -51,11 +51,10 @@ while True:
         msg = msg_raw.decode()
 
         # -- Print the received message
-        termcolor.cprint(f"Message received: {msg}", "green")
-        print("Message received: " + termcolor.colored(msg, "green"))
+        print(f"Message received: {msg}")
 
         # -- Send a response message to the client
-        response = "ECHO: " + msg
+        response = "HELLO. I am the Happy Server :-)\n"
 
         # -- The message has to be encoded into bytes
         cs.send(response.encode())
