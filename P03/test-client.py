@@ -5,8 +5,9 @@ PORT = 12345
 
 c = Client(IP, PORT)
 print(c)
-print("Testing Ping...")
-print(c.talk("PING"))
+def ping_response():
+    print("Testing Ping...")
+    print(c.talk("PING"))
 
 def get_response():
     responses = []
@@ -26,4 +27,32 @@ def info_response(response):
     print(response)
     return response
 
-print(info_response(responses[0]))
+n = info_response(responses[0])
+def comp_response(response):
+    print("Testing COMP...")
+    comp_msg = "COMP " + str(response)
+    response = c.talk((comp_msg))
+    print("COMP " + str(response))
+    return response
+comp = comp_response(responses[0])
+def rev_response(response):
+    print("Testing REV...")
+    rev_msg = "REV " + str(response)
+    response = c.talk((rev_msg))
+    print("REV " + str(response))
+    return response
+rev = rev_response(responses[0])
+
+def gene_response():
+    genes = ["U5", "FRAT1", "ADA", "FXN", "RNU6_269P"]
+    print("Testing GENE...")
+
+    for gene in genes:
+        gene_msg = "GENE " + str(gene)
+        response = c.talk((gene_msg))
+        print("GENE " + str(gene)+ " " + str(response))
+
+    return response
+
+gene = gene_response()
+
