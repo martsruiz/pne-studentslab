@@ -3,7 +3,7 @@ import termcolor
 
 # Configure the Server's IP and PORT
 PORT = 8080
-IP = "212.128.255.97"  # the IP address depends on the machine running the server
+IP = "212.128.255.30"  # the IP address depends on the machine running the server
 clients_list = []
 # Initialize connection counter
 connection_counter = 0
@@ -66,7 +66,7 @@ while True:
 
         # -- Close the data socket
         cs.close()
-        if connection_counter == 5:
+        if connection_counter % 5 == 0:
             for a, i in enumerate(clients_list, start=0):
                 print(f"Client {a}: {i} ")
 # -- Close the server socket

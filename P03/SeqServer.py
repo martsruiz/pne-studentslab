@@ -2,7 +2,7 @@ import socket
 from Seq1 import Seq
 import termcolor
 class SeqServer():
-    def __init__(self, msg =None):
+    def __init__(self, msg = None):
 
         # Configure the Server's IP and PORT
         PORT = 12345
@@ -13,6 +13,8 @@ class SeqServer():
 
         # create an INET, STREAMing socket
         serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        serversocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
         print("SEQ Server configured!")
 
         try:
@@ -75,8 +77,7 @@ class SeqServer():
         print(termcolor.colored("GET", "green"))
         print(n)
 
-        j = f" {n}\n"
-        return j
+        return n
 
 
 

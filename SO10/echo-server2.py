@@ -3,7 +3,7 @@ import termcolor
 
 # Configure the Server's IP and PORT
 PORT = 8080
-IP = "212.128.255.97"  # the IP address depends on the machine running the server
+IP = "212.128.255.30"  # the IP address depends on the machine running the server
 
 # Initialize connection counter
 connection_counter = 0
