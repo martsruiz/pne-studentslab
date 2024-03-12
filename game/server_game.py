@@ -24,6 +24,7 @@ class Number_Guesser():
             n = random.randint(1, 100)
             print(n)
             self.n = n
+            self.number_attempts = []
             while True:
                 # accept connections from outside
                 print("Waiting for connections at {}, {} ".format(IP, PORT))
@@ -51,22 +52,18 @@ class Number_Guesser():
 
 
     def guess(self, number):
-
-        rounds = 0
-        number_attempts = []
-
         if self.n == number:
-            answer = f" You won after {rounds} attempts"
+            answer = f" You won after {str(len(self.number_attempts))} attempts"
         elif self.n > number:
             answer = "Higher"
 
-            number_attempts.append(number)
+            self.number_attempts.append(number)
         elif self.n < number:
             answer = "Lower"
-            number_attempts.append(number)
-        rounds += 1
+            self.number_attempts.append(number)
 
-        print(number_attempts)
+        print(self.number_attempts)
+
 
         return answer
 

@@ -10,7 +10,7 @@ print(c)
 guessing = True
 while guessing:
     guess = input("Enter your guess (between 1 and 100)")
-    response = c.talk(gu41ess)
+    response = c.talk(guess)
     print(response)
 
     if ("You won") in response:
