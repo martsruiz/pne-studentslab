@@ -4,7 +4,7 @@ import socket
 
 # Configure the Server's IP and PORT
 PORT = 1234
-IP = "212.128.255.30"#"192.168.1.39" "212.128.255.90" # it depends on the machine the server is running
+IP = "212.128.255.33"#"192.168.1.39" "212.128.255.90" # it depends on the machine the server is running
 MAX_OPEN_REQUESTS = 5
 
 # Counting the number of connections

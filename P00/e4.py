@@ -13,5 +13,5 @@ sequences1 = ["Gene U5", "Gene ADA", "Gene FXN", "Gene FRAT1"]
 for sequence_name, sequence in zip(sequences1, sequences):
     print(sequence_name)
     for base in bases:
-        count = seq_count(sequence, base)
+        count = seq_count_base(sequence, base)
         print(str(base),count)

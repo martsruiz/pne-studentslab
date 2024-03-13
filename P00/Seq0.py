@@ -63,5 +63,3 @@ def seq_complement(seq) :
 
 
 
-
-
