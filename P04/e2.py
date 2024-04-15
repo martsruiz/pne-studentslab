@@ -1,5 +1,6 @@
 import socket
 import termcolor
+from pathlib import Path
 
 
 # -- Server network parameters
@@ -31,22 +32,8 @@ def process_client(s):
     # Body (content to send)
 
     # This new contents are written in HTML language
-    body = """
-    <!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>ADENINE</title>
-  </head>
-  <body style="background-color: lightgreen;">
-    <h1>ADENINE</h1>
-    <p>Letter:A</p>
-    <p>Chemical formula: C5H5N5 </p>
-    <a href="https://en.wikipedia.org/wiki/Adenine">More info</a>
-
-  </body>
-</html>
-    """
+    file = "html/info/A.html"
+    body = Path(file).read_text()
 
     # -- Status line: We respond that everything is ok (200 code)
     status_line = "HTTP/1.1 200 OK\n"

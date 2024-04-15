@@ -1,5 +1,6 @@
 import socket
 import termcolor
+from pathlib import Path
 
 
 # -- Server network parameters
@@ -19,7 +20,6 @@ def process_client(s):
 
     # -- The request line is the first
     req_line = lines[0]
-    method, path, _ = req_line.split(' ')
 
     print("Request line: ", end="")
     termcolor.cprint(req_line, "green")
@@ -31,74 +31,19 @@ def process_client(s):
     # blank line
     # Body (content to send)
 
-    # This new contents are written in HTML language
-    if path.endswith( "G") :
-        body = """
-        <!DOCTYPE html>
-    <html lang="en" dir="ltr">
-      <head>
-        <meta charset="utf-8">
-        <title>GUANINE</title>
-      </head>
-      <body style="background-color: lightblue;">
-        <h1>GUANINE</h1>
-        <p>Letter:G</p>
-        <p>Chemical formula: C5H5N0</p>
-        <a href="https://en.wikipedia.org/wiki/Guanine">More info</a>
-    
-      </body>
-    </html>
-        """
-    elif path.endswith( "T") :
-        body = """
-        <!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>THYMINE</title>
-  </head>
-  <body style="background-color: lightgreen;">
-    <h1>THYMINE</h1>
-    <p>Letter:T</p>
-    <p>Chemical formula: C4H6N202</p>
-    <a href="https://en.wikipedia.org/wiki/Thymine">More info</a>
+    if req_line.__contains__("info/A"):
+        file = "html/info/A.html"
 
-  </body>
-</html>"""
-    elif path.endswith("A"):
-        body = """
-            <!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>ADENINE</title>
-  </head>
-  <body style="background-color: lightgreen;">
-    <h1>ADENINE</h1>
-    <p>Letter:A</p>
-    <p>Chemical formula: C5H5N5 </p>
-    <a href="https://en.wikipedia.org/wiki/Adenine">More info</a>
+    elif req_line.__contains__("info/C"):
+        file = "html/info/C.html"
 
-  </body>
-</html>
-    """
+    elif req_line.__contains__("info/T"):
+        file = "html/info/T.html"
 
-    elif path.endswith("C"):
-        body = """
-        <!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>CYTOSINE</title>
-  </head>
-  <body style="background-color: yellow;">
-    <h1>CYTOSINE</h1>
-    <p>Letter:C</p>
-    <p>Chemical formula: C4H5N30</p>
-    <a href="https://en.wikipedia.org/wiki/Cytosine">More info</a>
+    elif req_line.__contains__("info/G"):
+        file = "html/info/G.html"
 
-  </body>
-</html>"""
+    body = Path(file).read_text()
 
 
     # -- Status line: We respond that everything is ok (200 code)
