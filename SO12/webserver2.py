@@ -33,21 +33,17 @@ def process_client(s):
     # This new contents are written in HTML language
     body = """
     <!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>ADENINE</title>
-  </head>
-  <body style="background-color: lightgreen;">
-    <h1>ADENINE</h1>
-    <p>Letter:A</p>
-    <p>Chemical formula: C5H5N5 </p>
-    <a href="https://en.wikipedia.org/wiki/Adenine">More info</a>
-
-  </body>
-</html>
+    <html lang="en" dir="ltr">
+      <head>
+        <meta charset="utf-8">
+        <title>Green server</title>
+      </head>
+      <body style="background-color: lightgreen;">
+        <h1>GREEN SERVER</h1>
+        <p>I am the Green Server! :-)</p>
+      </body>
+    </html>
     """
-
     # -- Status line: We respond that everything is ok (200 code)
     status_line = "HTTP/1.1 200 OK\n"
 

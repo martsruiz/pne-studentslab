@@ -36,13 +36,15 @@ def process_client(s):
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>ADENINE</title>
+    <title>Bases information</title>
   </head>
-  <body style="background-color: lightgreen;">
-    <h1>ADENINE</h1>
-    <p>Letter:A</p>
-    <p>Chemical formula: C5H5N5 </p>
-    <a href="https://en.wikipedia.org/wiki/Adenine">More info</a>
+  <body style="background-color: white;">
+    <h1>Bases information</h1>
+    <p>Click on the following links to have more information</p>
+    <a href="http://localhost:63342/pne-studentslab/P04/html/info/A.html?_ijt=fhf3gtd9vcs2oc9oeuitn62kk&_ij_reload=RELOAD_ON_SAVE">[A]</a>
+    <a href="http://localhost:63342/pne-studentslab/P04/html/info/C.html?_ijt=fhf3gtd9vcs2oc9oeuitn62kk&_ij_reload=RELOAD_ON_SAVE">[C]</a>
+    <a href="http://localhost:63342/pne-studentslab/P04/html/info/G.html?_ijt=fhf3gtd9vcs2oc9oeuitn62kk&_ij_reload=RELOAD_ON_SAVE">[G]</a>
+    <a href="http://localhost:63342/pne-studentslab/P04/html/info/T.html?_ijt=fhf3gtd9vcs2oc9oeuitn62kk&_ij_reload=RELOAD_ON_SAVE">[T]</a>
 
   </body>
 </html>
