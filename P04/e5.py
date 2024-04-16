@@ -1,6 +1,8 @@
 import socket
 import termcolor
 from pathlib import Path
+import os
+
 
 # -- Server network parameters
 IP = "127.0.0.1"
@@ -23,32 +25,50 @@ def process_client(s):
     print("Request line: ", end="")
     termcolor.cprint(req_line, "green")
 
-    # -- Generate the response message
-    # It has the following lines
-    # Status line
-    # header
-    # blank line
-    # Body (content to send)
+    slices = req_line.split(" ")
+    method = slices[0]
+    resource = slices[1]
+    version = slices[2]
 
+
+
+    if resource == "/info/A":
+        file_name = os.path.join("html", "info", "A.html")
     # This new contents are written in HTML language
-    if req_line.__contains__("info/A"):
-        file = "html/info/A.html"
-
-    elif req_line.__contains__("info/C"):
-        file = "html/info/C.html"
-
-    elif req_line.__contains__("info/T"):
-        file = "html/info/T.html"
-
-    elif req_line.__contains__("info/G"):
-        file = "html/info/G.html"
-    else:
-        file = "html/info/error.html"
-
-    body = Path(file).read_text()
-
+        body = Path(file_name).read_text()
     # -- Status line: We respond that everything is ok (200 code)
-    status_line = "HTTP/1.1 200 OK\n"
+        status_line = "HTTP/1.1 200 OK\n"
+
+    elif resource == "/info/C":
+        file_name = os.path.join("html", "info", "C.html")
+    # This new contents are written in HTML language
+        body = Path(file_name).read_text()
+    # -- Status line: We respond that everything is ok (200 code)
+        status_line = "HTTP/1.1 200 OK\n"
+
+    elif resource == "/info/T":
+        file_name = os.path.join("html", "info", "T.html")
+    # This new contents are written in HTML language
+        body = Path(file_name).read_text()
+    # -- Status line: We respond that everything is ok (200 code)
+        status_line = "HTTP/1.1 200 OK\n"
+
+    elif resource == "/info/G":
+        file_name = os.path.join ("html", "info", "G.html")
+    # This new contents are written in HTML language
+        body = Path(file_name).read_text()
+    # -- Status line: We respond that everything is ok (200 code)
+        status_line = "HTTP/1.1 200 OK\n"
+
+    else:
+        file_name = os.path.join ("html", "info", "error.html")
+        # This new contents are written in HTML language
+        body = Path(file_name).read_text()
+        # -- Status line: We respond that everything is ok (200 code)
+        status_line = "HTTP/1.1 404 Not found\n"
+
+
+
 
     # -- Add the Content-Type header
     header = "Content-Type: text/html\n"
