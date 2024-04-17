@@ -26,6 +26,7 @@ def process_client(s):
     termcolor.cprint(req_line, "green")
 
     slices = req_line.split(" ")
+    print(slices)
     method = slices[0]
     resource = slices[1]
     version = slices[2]
