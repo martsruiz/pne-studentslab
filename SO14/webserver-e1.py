@@ -27,7 +27,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         # that everything is ok
 
         # Message to send back to the client
-        if self.requestline == "localhost:8080":
+        if self.path == "/":
             contents = "I am the happy server! :-)"
         else:
             contents = "Resource not available"

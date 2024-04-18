@@ -10,6 +10,7 @@ socketserver.TCPServer.allow_reuse_address = True
 # -- Use the http.server Handler
 Handler = http.server.SimpleHTTPRequestHandler
 
+
 # -- Open the socket server
 with socketserver.TCPServer(("", PORT), Handler) as httpd:
 
