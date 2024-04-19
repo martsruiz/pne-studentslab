@@ -27,19 +27,30 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         # We are NOT processing the client's request
         # It is a happy server: It always returns a message saying
         # that everything is ok
-        files = ["/", "/index.html", "/blue.html", "/green.htm", "/pink.htm"]
         # Message to send back to the client
-        for file in files:
-            if self.path == file:
-                file_name = os.path.join(file)
-                # This new contents are written in HTML language
-                contents = Path(file_name).read_text()
+        if self.path == "/" or self.path == "/index.html":
+            file_name = os.path.join("index.html")
+            # This new contents are written in HTML language
+            contents = Path(file_name).read_text()
+        elif self.path == "/pink.html":
+            file_name = os.path.join("pink.html")
+            # This new contents are written in HTML language
+            contents = Path(file_name).read_text()
 
+        elif self.path == "/blue.html":
+            file_name = os.path.join("blue.html")
+            # This new contents are written in HTML language
+            contents = Path(file_name).read_text()
 
-            else:
-                file_name = os.path.join("error.html")
-                # This new contents are written in HTML language
-                contents = Path(file_name).read_text()
+        elif self.path == "/green.html":
+            file_name = os.path.join("green.html")
+            # This new contents are written in HTML language
+            contents = Path(file_name).read_text()
+
+        else:
+            file_name = os.path.join("error.html")
+            # This new contents are written in HTML language
+            contents = Path(file_name).read_text()
 
 
         # Generating the response message
