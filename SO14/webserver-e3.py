@@ -1,6 +1,8 @@
 import http.server
 import socketserver
 import termcolor
+from pathlib import Path
+import os
 
 # Define the Server's port
 PORT = 8080
@@ -25,18 +27,26 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         # We are NOT processing the client's request
         # It is a happy server: It always returns a message saying
         # that everything is ok
-
+        files = ["/", "/index.html", "/blue.html", "/green.htm", "/pink.htm"]
         # Message to send back to the client
-        if self.requestline == "localhost:8080":
-            contents = "I am the happy server! :-)"
-        else:
-            contents = "Resource not available"
+        for file in files:
+            if self.path == file:
+                file_name = os.path.join(file)
+                # This new contents are written in HTML language
+                contents = Path(file_name).read_text()
+
+
+            else:
+                file_name = os.path.join("error.html")
+                # This new contents are written in HTML language
+                contents = Path(file_name).read_text()
+
 
         # Generating the response message
         self.send_response(200)  # -- Status line: OK!
 
         # Define the content-type header:
-        self.send_header('Content-Type', 'text/plain')
+        self.send_header('Content-Type', 'text/html')
         self.send_header('Content-Length', len(contents.encode()))
 
         # The header is finished
