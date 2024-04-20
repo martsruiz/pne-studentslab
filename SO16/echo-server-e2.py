@@ -37,12 +37,17 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         print(self.path)
         if (path == "/" or path == "/echo"):
             if "msg" in arguments:
-                print(arguments)
-                text = arguments["msg"][0]
-                contents = read_html_file("response.html").render(context={"user_message":text})  # provide a dictionary to build the form
+                if "chk" in arguments:
+                    text = arguments["msg"][0].upper()
+                    contents = read_html_file("response2.html").render(context={"user_message": text})  # provide a dictionary to build the form
+                else:
+                    text = arguments["msg"][0]
+                    contents = read_html_file("response2.html").render(
+                        context={"user_message": text})  # provide a dictionary to build the form
+
 
             else:
-                contents = Path('html/form-e1.html').read_text()
+                contents = Path('html/form-e2.html').read_text()
 
 
         else:
