@@ -113,7 +113,7 @@ class SeqServer():
 
         return c
 
-    def rev_response(selfsel, msg):
+    def rev_response(self, msg):
         new_seq = msg.replace("REV", "").strip()
         print(termcolor.colored("REV", "green"))
         s = Seq(str(new_seq))
