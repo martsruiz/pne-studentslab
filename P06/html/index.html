@@ -8,11 +8,12 @@
     <h1>SEQ2 server</h1>
     Access to the Server <br>
     <hr>
-    <form action="echo" method="get">
+    <form action="ping" method="get">
       Is the server alive?
       <input type="submit" value="PING"><br>
-
+    </form>
     <hr>
+    <form action="get" method="get">
     Get a Sequence. Select sequence number
       <select name="sequence">
           <option value="0">0</option>
@@ -22,7 +23,9 @@
           <option value="4">4</option>
       </select>
         <input type="submit" value="GET"><br>
+    </form>
     <hr>
+    <form action="gene" method="get">
     Get a Gene. Select the name
       <select name="gene">
           <option value="FRAT1">FRAT1</option>
@@ -32,7 +35,9 @@
           <option value="FXN">FXN</option>
       </select>
         <input type="submit" value="GENE"><br>
+    </form>
     <hr>
+    <form action="operate" method="get">
     Write a sequence
         <input type="text" name="msg"><br>
     Select an operation

@@ -34,7 +34,7 @@ def gene_response( msg):
     s = Seq()
     with_space = s.read_fasta(file) + "\n"
     return with_space
-def comp_response(self, msg):
+def comp_response(msg):
     seq = msg.replace("COMP", "").strip()
     s = Seq(str(seq))
     complement = s.complement()
@@ -43,16 +43,18 @@ def comp_response(self, msg):
     return c
 
 def info_response(msg):
-    seq = msg.replace("INFO", "").strip()
-    s1 = Seq(str(seq))
+    s1 = Seq(str(msg))
     length = s1.len()
     base_counts = s1.count()
 
-    for base, count in base_counts.items():
-        percentage = round((count / length) * 100,1)
-        answer =  (f"{base}: {count} ({percentage} %)\n")
+    total_bases = sum(base_counts.values())
 
-    return answer
+    result_str = f"Length: {length}\n"
+    for base, count in base_counts.items():
+        percentage = round(count / total_bases * 100, 1)
+        result_str += f"{base}: {count} ({percentage}%)\n"
+
+    return result_str
 
 def rev_response( msg):
     new_seq = msg.replace("REV", "").strip()
@@ -82,38 +84,34 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         print(path)
         print(arguments)
         if path == "/" or path == "/echo":
-            if "sequence" in arguments :
+            contents = Path("html/index.html").read_text()
+        elif path == "/ping":
+            contents = Path("html/ping.html").read_text()
+        elif path == "/get" :
+            text = arguments["sequence"][0]
+            seq = get_response(text)
+            contents = read_html_file("get.html").render(context={"complete_sequence": seq, "number_seq": text})
 
-                if "gene" in arguments:
+        elif path == "/gene":
+            text = arguments["gene"][0]
+            seq = gene_response(text)
+            contents = read_html_file("gene.html").render(context={"gene_sequence": seq, "gene_name": text})
 
-                    if "msg" in arguments and "type" in arguments:
-                        seq = arguments["msg"][0]
-                        type = arguments["type"][0]
-                        if type == "Comp":
-                            sequence = comp_response(seq)
-                            contents = read_html_file("operation.html").render(context={"user_sequence": seq, "operation": type, "info": sequence})
-                        elif type == "Info":
-                            sequence = info_response(seq)
-                            contents = read_html_file("operation.html").render(context={"user_sequence": seq, "operation": type, "info": sequence})
-                        elif type == "Rev":
-                            sequence = rev_response(seq)
-                            contents = read_html_file("operation.html").render(context={"user_sequence": seq, "operation": type, "info": sequence})
-                    else:
-                        text = arguments["gene"][0]
-                        seq = gene_response(text)
-                        contents = read_html_file("gene.html").render(context={"gene_sequence": seq, "gene_name": text})
+        elif path == "/operate":
+            seq = arguments["msg"][0]
+            type = arguments["type"][0]
 
+            if type == "Comp":
+                sequence1 = comp_response(str(seq))
+                contents = read_html_file("operation.html").render(context={"user_sequence": seq, "operation": type, "info": sequence1})
 
+            elif type == "Info":
+                sequence2 = info_response(seq)
+                contents = read_html_file("operation.html").render(context={"user_sequence": seq, "operation": type, "info": sequence2})
 
-                else:
-                    text = arguments["sequence"][0]
-                    seq = get_response(text)
-                    contents = read_html_file("get.html").render(context={"complete_sequence": seq, "number_seq": text})
-
-
-            else:
-                contents = Path("html/index.html").read_text()
-
+            elif type == "Rev":
+                sequence3 = rev_response(seq)
+                contents = read_html_file("operation.html").render(context={"user_sequence": seq, "operation": type, "info": sequence3})
 
 
 
