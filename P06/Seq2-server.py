@@ -83,6 +83,8 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         termcolor.cprint(self.requestline, 'green')
         print(path)
         print(arguments)
+        contents = ""
+
         if path == "/" or path == "/echo":
             contents = Path("html/index.html").read_text()
         elif path == "/ping":
@@ -149,3 +151,4 @@ with socketserver.TCPServer(("", PORT), Handler) as httpd:
         print("")
         print("Stopped by the user")
         httpd.server_close()
+
