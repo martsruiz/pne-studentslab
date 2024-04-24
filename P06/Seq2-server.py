@@ -84,7 +84,6 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         print(path)
         print(arguments)
         contents = ""
-
         if path == "/" or path == "/echo":
             contents = Path("html/index.html").read_text()
         elif path == "/ping":

@@ -25,10 +25,10 @@ for person in people:
 
     # Print all the numbers
     for i, dictnum in enumerate(phoneNumbers):
-        termcolor.cprint("  Phone " + str(i + 1) + ": ", 'blue')
+        termcolor.cprint("  Phone " + str(i) + ": ", 'blue')
 
         # The element num contains 2 fields: number and type
-        termcolor.cprint("\t- Type: ", 'red', end='')
+        termcolor.cprint("\tType: ", 'red', end='')
         print(dictnum['type'])
-        termcolor.cprint("\t- Number: ", 'red', end='')
+        termcolor.cprint("\tNumber: ", 'red', end='')
         print(dictnum['number'])
