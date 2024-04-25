@@ -33,7 +33,7 @@ genes = {
     "FGFR3": "ENSG00000068078",
     "KDR": "ENSG00000128052",
     "ANK2": "ENSDARG00000009026"
-}
+    }
 user_input= input("Please enter a gene").upper()
 USER_ENS = genes[str(user_input)]
 
