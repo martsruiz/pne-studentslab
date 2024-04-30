@@ -18,6 +18,40 @@ def read_html_file(filename):
     contents = Path("html/" + filename).read_text()
     contents = j.Template(contents)
     return contents
+def connect_server(ENDPOINT):
+    SERVER = "rest.ensembl.org"
+
+    PARAMETERS = "?content-type=application/json"
+
+    url = ENDPOINT + PARAMETERS
+    print()
+    print(f"Server: {SERVER}")
+    print(f"URL: {url}")
+
+    conn = http.client.HTTPConnection(SERVER)
+
+    # -- Send the request message, using the GET method. We are
+    # -- requesting the main page (/)
+    try:
+        conn.request("GET", url)
+    except ConnectionRefusedError:
+        print("ERROR! Cannot connect to the Server")
+        exit()
+
+    # -- Read the response message from the server
+    r1 = conn.getresponse()
+
+    # -- Print the status line
+    print(f"Response received!: {r1.status} {r1.reason}\n")
+
+    # -- Read the response's body
+    data1 = r1.read().decode("utf-8")
+
+    # -- Create a variable with the data,
+    # -- form the JSON received
+    person = json.loads(data1) # aqui convertimos el string en json
+
+    return person
 
 
 # -- This is for preventing the error: "Port already in use"
@@ -41,45 +75,33 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             contents = Path("index.html").read_text()
 
         elif path == "/listSpecies":
-            limit = arguments["limit"][0]
-
-
-            SERVER = "rest.ensembl.org"
             ENDPOINT = "/info/species"
-            PARAMETERS = "?content-type=application/json"
+            total_list = connect_server(ENDPOINT)
+            total_species = len(total_list["species"])
 
-            url = ENDPOINT + PARAMETERS
-            print()
-            print(f"Server: {SERVER}")
-            print(f"URL: {url}")
+            if arguments == {}:
+                limit = int(total_species)
+            else:
+                limit = arguments["limit"][0]
 
-            conn = http.client.HTTPConnection(SERVER)
+            list_species = []
+            for specie in total_list["species"][:int(limit)]:
+                n = (specie["common_name"]).capitalize()
+                list_species.append(n)
+            contents = read_html_file("list-species.html").render(
+                context={"limit_number": limit, "total_number": total_species, "list_species": list_species})
 
-            # -- Send the request message, using the GET method. We are
-            # -- requesting the main page (/)
-            try:
-                conn.request("GET", url)
-            except ConnectionRefusedError:
-                print("ERROR! Cannot connect to the Server")
-                exit()
+        elif path == "/karyotype":
+            specie = arguments["species"][0].replace("+","").lower().strip()
+            print(specie)
 
-            # -- Read the response message from the server
-            r1 = conn.getresponse()
+            ENDPOINT = "/info/assembly/" + str(specie)
+            karyotype = connect_server(ENDPOINT)
+            karyotype_list = (karyotype["karyotype"])
+            contents = read_html_file("karyotype.html").render(
+                context={"names_karyotype": karyotype_list})
 
-            # -- Print the status line
-            print(f"Response received!: {r1.status} {r1.reason}\n")
-
-            # -- Read the response's body
-            data1 = r1.read().decode("utf-8")
-
-            # -- Create a variable with the data,
-            # -- form the JSON received
-            person = json.loads(data1) # aqui convertimos el string en json
-            total_species = len(person["species"])
-            contents = read_html_file("list-species.html").render(context={"limit_number": limit, "total_number": total_species})
-
-
-# Generating the response message
+        # Generating the response message
         self.send_response(200)  # -- Status line: OK!
 
         # Define the content-type header:
