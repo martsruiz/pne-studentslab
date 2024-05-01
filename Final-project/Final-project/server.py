@@ -92,7 +92,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 context={"limit_number": limit, "total_number": total_species, "list_species": list_species})
 
         elif path == "/karyotype":
-            specie = arguments["species"][0].replace("+","").lower().strip()
+            specie = arguments["species"][0].replace("+","").lower().strip().replace(" ", "_")
             print(specie)
 
             ENDPOINT = "/info/assembly/" + str(specie)
