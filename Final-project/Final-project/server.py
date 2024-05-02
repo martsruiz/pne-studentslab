@@ -10,6 +10,7 @@ import json
 
 import jinja2 as j
 from Seq1 import Seq
+import urllib.parse
 
 
 # Define the Server's port
@@ -24,6 +25,8 @@ def connect_server(ENDPOINT):
     PARAMETERS = "?content-type=application/json"
 
     url = ENDPOINT + PARAMETERS
+    URL = SERVER + url
+    print(URL)
     print()
     print(f"Server: {SERVER}")
     print(f"URL: {url}")
@@ -91,15 +94,39 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             contents = read_html_file("list-species.html").render(
                 context={"limit_number": limit, "total_number": total_species, "list_species": list_species})
 
-        elif path == "/karyotype":
-            specie = arguments["species"][0].replace("+","").lower().strip().replace(" ", "_")
-            print(specie)
 
-            ENDPOINT = "/info/assembly/" + str(specie)
-            karyotype = connect_server(ENDPOINT)
-            karyotype_list = (karyotype["karyotype"])
+
+
+        elif path == "/karyotype":
+
+            specie = arguments["species"][0].replace("+", "").strip()
+            specie1 = urllib.parse.quote(specie)
+            ENDPOINT = "/info/assembly/" + specie1
+
+            specie_list = connect_server(ENDPOINT)
+
+            karyotype_list = (specie_list["karyotype"])
+
             contents = read_html_file("karyotype.html").render(
                 context={"names_karyotype": karyotype_list})
+
+
+        elif path == "/chromosomeLength":
+            specie = arguments["species"][0].replace("+", "").lower().strip()
+            number_chromosome = arguments["chromo"][0]
+            ENDPOINT1 = "/info/assembly/"
+            ENDPOINT_COMPLETE = ENDPOINT1 + urllib.parse.quote(specie)
+            total_list = connect_server(ENDPOINT_COMPLETE)
+
+            for j in total_list["top_level_region"]:
+                if j["name"] == number_chromosome and j["coord_system"] == "chromosome":
+                    chromosome_length = j["length"]
+
+            contents = read_html_file("chromosome_length.html").render(
+                context={"chromosome_length": chromosome_length})
+
+
+
 
         # Generating the response message
         self.send_response(200)  # -- Status line: OK!
