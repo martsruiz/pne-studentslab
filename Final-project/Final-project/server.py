@@ -125,8 +125,34 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             contents = read_html_file("chromosome_length.html").render(
                 context={"chromosome_length": chromosome_length})
 
+        elif path == "/geneSeq":
+            name_gene = arguments["gene"][0]
+            print(name_gene)
+            ENDPOINT = "/lookup/symbol/human/" + str(name_gene)
+            gene_info = connect_server(ENDPOINT)
+            id = gene_info["id"]
+            ENDPOINT1 = "/sequence/id/" + str(id)
+            gene_sequence = connect_server(ENDPOINT1)
+            sequence = gene_sequence["seq"]
+            contents = read_html_file("gene_sequence.html").render(
+                context={"user_gene": name_gene, "sequence": sequence})
 
-
+        elif path == "/geneInfo":
+            name_gene = arguments["gene"][0]
+            ENDPOINT = "/lookup/symbol/human/" + str(name_gene)
+            gene_info = connect_server(ENDPOINT)
+            start = gene_info["start"]
+            end = gene_info["end"]
+            id = gene_info["id"]
+            ENDPOINT1 = "/sequence/id/" + str(id)
+            gene_sequence = connect_server(ENDPOINT1)
+            sequence = gene_sequence["seq"]
+            length = len(str(sequence))
+            chromosome_info = gene_sequence["desc"]
+            chromosome_info= str(chromosome_info).split(":")
+            chromosome_number = chromosome_info[2]
+            contents = read_html_file("gene_info.html").render(
+                context={"user_gene": name_gene, "start": start, "end": end, "id":id, "chromosome" : chromosome_number, "length": length})
 
         # Generating the response message
         self.send_response(200)  # -- Status line: OK!
