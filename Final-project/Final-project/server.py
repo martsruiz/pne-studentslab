@@ -7,7 +7,6 @@ from urllib.parse import parse_qs, urlparse
 import http.client
 import json
 
-
 import jinja2 as j
 from Seq1 import Seq
 import urllib.parse
@@ -55,6 +54,20 @@ def connect_server(ENDPOINT):
     person = json.loads(data1) # aqui convertimos el string en json
 
     return person
+
+def info_response(msg):
+    s1 = Seq(str(msg))
+    length = s1.len()
+    base_counts = s1.count()
+
+    total_bases = sum(base_counts.values())
+
+    info_list = [f"Length: {length}"]
+    for base, count in base_counts.items():
+        percentage = round(count / total_bases * 100, 1)
+        info_list.append(f"{base}: {count} ({percentage}%)")
+
+    return info_list
 
 
 # -- This is for preventing the error: "Port already in use"
@@ -153,6 +166,30 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             chromosome_number = chromosome_info[2]
             contents = read_html_file("gene_info.html").render(
                 context={"user_gene": name_gene, "start": start, "end": end, "id":id, "chromosome" : chromosome_number, "length": length})
+
+        elif path == "/geneCalc":
+            name_gene = arguments["gene"][0]
+            ENDPOINT = "/lookup/symbol/human/" + str(name_gene)
+            gene_info = connect_server(ENDPOINT)
+            id = gene_info["id"]
+            ENDPOINT1 = "/sequence/id/" + str(id)
+            gene_sequence = connect_server(ENDPOINT1)
+            sequence = gene_sequence["seq"]
+            calc_gene = info_response(str(sequence))
+            print(calc_gene)
+            length = len(str(sequence))
+            contents = read_html_file("calculation_gene.html").render(
+                context={"user_gene": name_gene, "bases": calc_gene,
+                         "length": length})
+
+        elif path == "/geneList":
+            chromosome = arguments["chromo"][0]
+            start = arguments["start"][0]
+            end = arguments ["end"][0]
+            ENDPOINT = f"/overlap/region/human/{chromosome}:{start}-{end}"
+            gene_info = connect_server(ENDPOINT)
+            contents = read_html_file("gene_list.html")
+
 
         # Generating the response message
         self.send_response(200)  # -- Status line: OK!

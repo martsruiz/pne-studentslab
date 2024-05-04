@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>calculation</title>
+</head>
+<body style="background-color: lightblue;">
+    <h1>Calculation human Gene: {{context.user_gene}}</h1>
+    <br>
+    <ul>
+      {% for base in context.bases %}
+        <li>{{base}}</li>
+      {% endfor %}
+    </ul>
+    <br>
+
+
+</body>
+</html>
