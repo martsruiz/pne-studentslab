@@ -186,7 +186,8 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             chromosome = arguments["chromo"][0]
             start = arguments["start"][0]
             end = arguments ["end"][0]
-            ENDPOINT = f"/overlap/region/human/{chromosome}:{start}-{end}"
+            ENDPOINT = f"/overlap/region/human/{chromosome}:{start}-{end}/gene"
+            
             gene_info = connect_server(ENDPOINT)
             contents = read_html_file("gene_list.html")
 
