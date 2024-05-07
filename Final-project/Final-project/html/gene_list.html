@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <title>gen_list</title>
 </head>
-<body>
-<h1>Human Gene: </h1>
-
+<body style="background-color: lightblue;">
+<h1>Genes located in chromosome: {{ context.user_chromo }} </h1>
+<p>From the start position: {{ context.start_position }} to the end position: {{ context.end_position }}</p>
+<ul>
+      {% for s in context.list_of_genes %}
+        <li>{{s}}</li>
+      {% endfor %}
+    </ul>
 </body>
 </html>
