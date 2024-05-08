@@ -89,6 +89,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         print(path)
         print(arguments)
         contents = ""
+        json_arguments = arguments["json"][0]
         if path == "/":
             contents = Path("index.html").read_text()
 
@@ -106,8 +107,14 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             for specie in total_list["species"][:int(limit)]:
                 n = (specie["common_name"]).capitalize()
                 list_species.append(n)
-            contents = read_html_file("list-species.html").render(
-                context={"limit_number": limit, "total_number": total_species, "list_species": list_species})
+
+            info = {"limit_number": limit, "total_number": total_species, "list_species": list_species}
+
+            if json_arguments == 0:
+                contents = read_html_file("list-species.html").render(
+                context=info)
+            elif json_arguments == 1:
+                contents = json.dumps(info)
 
 
 
@@ -200,28 +207,36 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             contents = read_html_file("gene_list.html").render(
                 context= dic_info)
 
-        else:
-            contents = Path("error.html").read_text()
 
 
 
+        if json_arguments == 0:
 
+            # Generating the response message
+            self.send_response(200)  # -- Status line: OK!
 
+            # Define the content-type header:
+            self.send_header('Content-Type', 'text/html')
+            self.send_header('Content-Length', len(str.encode(contents)))
 
+            # The header is finished
+            self.end_headers()
 
-        # Generating the response message
-        self.send_response(200)  # -- Status line: OK!
+            # Send the response message
+            self.wfile.write(str.encode(contents))
 
-        # Define the content-type header:
-        self.send_header('Content-Type', 'text/html')
-        self.send_header('Content-Length', len(str.encode(contents)))
+        elif json_arguments == 1:
+            self.send_response(200)  # -- Status line: OK!
 
-        # The header is finished
-        self.end_headers()
+            # Define the content-type header:
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', len(str.encode(contents)))
 
-        # Send the response message
-        self.wfile.write(str.encode(contents))
+            # The header is finished
+            self.end_headers()
 
+            # Send the response message
+            self.wfile.write(str.encode(contents))
 
 
 

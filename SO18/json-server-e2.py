@@ -26,7 +26,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         # -- NOTE: self.path already contains the requested resource
         list_resource = self.path.split('?')
         resource = list_resource[0]
-
+        print(self.path)
         if resource == "/":
             # Read the file
             contents = Path('index.html').read_text()
