@@ -127,15 +127,12 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 contents = Path("error.html").read_text()
 
 
-
-
-
         elif path == "/karyotype":
 
             specie = arguments["species"][0].replace("+", "").strip()
             specie1 = urllib.parse.quote(specie)
 
-            specie_found = check_specie(specie1)
+            specie_found = check_specie(specie)
 
             if not specie_found:
                 contents = Path("error.html").read_text()
@@ -150,79 +147,116 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                     context={"names_karyotype": karyotype_list})
 
 
+
         elif path == "/chromosomeLength":
-            specie = arguments["species"][0].replace("+", "").lower().strip()
-            number_chromosome = arguments["chromo"][0]
-            ENDPOINT1 = "/info/assembly/"
-            ENDPOINT_COMPLETE = ENDPOINT1 + urllib.parse.quote(specie)
-            total_list = connect_server(ENDPOINT_COMPLETE)
 
-            for j in total_list["top_level_region"]:
-                if j["name"] == number_chromosome and j["coord_system"] == "chromosome":
-                    chromosome_length = j["length"]
+            if "species" not in arguments or "chromo" not in arguments:
+                contents = Path("error.html").read_text()
 
-            contents = read_html_file("chromosome_length.html").render(
-                context={"chromosome_length": chromosome_length})
+            else:
+                specie = arguments["species"][0].replace("+", "").lower().strip()
+                number_chromosome = arguments["chromo"][0]
+                ENDPOINT1 = "/info/assembly/"
+                ENDPOINT_COMPLETE = ENDPOINT1 + urllib.parse.quote(specie)
+                total_list = connect_server(ENDPOINT_COMPLETE)
+                specie_found = check_specie(specie)
+                if not specie_found:
+                    contents = Path("error.html").read_text()
+                else:
+                    chromosome_length = None
+                    for j in total_list["top_level_region"]:
+                        if j["name"] == number_chromosome and j["coord_system"] == "chromosome":
+                            chromosome_length = j["length"]
+                            break
+
+                    if chromosome_length is not None:
+                        contents = read_html_file("chromosome_length.html").render(
+                            context={"chromosome_length": chromosome_length})
+
+                    else:
+                        contents = Path("error.html").read_text()  # Error si el número de cromosoma no es válido
+
+
+
 
         elif path == "/geneSeq":
             name_gene = arguments["gene"][0]
             print(name_gene)
-            ENDPOINT = "/lookup/symbol/human/" + str(name_gene)
-            gene_info = connect_server(ENDPOINT)
-            id = gene_info["id"]
-            ENDPOINT1 = "/sequence/id/" + str(id)
-            gene_sequence = connect_server(ENDPOINT1)
-            sequence = gene_sequence["seq"]
-            contents = read_html_file("gene_sequence.html").render(
-                context={"user_gene": name_gene, "sequence": sequence})
+            try:
+                ENDPOINT = "/lookup/symbol/human/" + str(name_gene)
+                gene_info = connect_server(ENDPOINT)
+                id = gene_info["id"]
+                ENDPOINT1 = "/sequence/id/" + str(id)
+                gene_sequence = connect_server(ENDPOINT1)
+                sequence = gene_sequence["seq"]
+                contents = read_html_file("gene_sequence.html").render(
+                    context={"user_gene": name_gene, "sequence": sequence})
+
+            except Exception:
+                contents = Path("error.html").read_text()
+
 
         elif path == "/geneInfo":
-            name_gene = arguments["gene"][0]
-            ENDPOINT = "/lookup/symbol/human/" + str(name_gene)
-            gene_info = connect_server(ENDPOINT)
-            start = gene_info["start"]
-            end = gene_info["end"]
-            id = gene_info["id"]
-            ENDPOINT1 = "/sequence/id/" + str(id)
-            gene_sequence = connect_server(ENDPOINT1)
-            sequence = gene_sequence["seq"]
-            length = len(str(sequence))
-            chromosome_info = gene_sequence["desc"]
-            chromosome_info= str(chromosome_info).split(":")
-            chromosome_number = chromosome_info[2]
-            contents = read_html_file("gene_info.html").render(
-                context={"user_gene": name_gene, "start": start, "end": end, "id":id, "chromosome" : chromosome_number, "length": length})
+            try:
+                name_gene = arguments["gene"][0]
+                ENDPOINT = "/lookup/symbol/human/" + str(name_gene)
+                gene_info = connect_server(ENDPOINT)
+                start = gene_info["start"]
+                end = gene_info["end"]
+                id = gene_info["id"]
+                ENDPOINT1 = "/sequence/id/" + str(id)
+                gene_sequence = connect_server(ENDPOINT1)
+                sequence = gene_sequence["seq"]
+                length = len(str(sequence))
+                chromosome_info = gene_sequence["desc"]
+                chromosome_info= str(chromosome_info).split(":")
+                chromosome_number = chromosome_info[2]
+                contents = read_html_file("gene_info.html").render(
+                    context={"user_gene": name_gene, "start": start, "end": end, "id":id, "chromosome" : chromosome_number, "length": length})
+            except Exception:
+                contents = Path("error.html").read_text()
 
         elif path == "/geneCalc":
-            name_gene = arguments["gene"][0]
-            ENDPOINT = "/lookup/symbol/human/" + str(name_gene)
-            gene_info = connect_server(ENDPOINT)
-            id = gene_info["id"]
-            ENDPOINT1 = "/sequence/id/" + str(id)
-            gene_sequence = connect_server(ENDPOINT1)
-            sequence = gene_sequence["seq"]
-            calc_gene = info_response(str(sequence))
-            print(calc_gene)
-            length = len(str(sequence))
-            contents = read_html_file("calculation_gene.html").render(
-                context={"user_gene": name_gene, "bases": calc_gene,
+            try:
+                name_gene = arguments["gene"][0]
+                ENDPOINT = "/lookup/symbol/human/" + str(name_gene)
+                gene_info = connect_server(ENDPOINT)
+                id = gene_info["id"]
+                ENDPOINT1 = "/sequence/id/" + str(id)
+                gene_sequence = connect_server(ENDPOINT1)
+                sequence = gene_sequence["seq"]
+                calc_gene = info_response(str(sequence))
+                print(calc_gene)
+                length = len(str(sequence))
+                contents = read_html_file("calculation_gene.html").render(
+                    context={"user_gene": name_gene, "bases": calc_gene,
                          "length": length})
+            except Exception:
+                contents = Path("error.html").read_text()
 
         elif path == "/geneList":
-            chromosome = arguments["chromo"][0]
-            start = arguments["start"][0]
-            end = arguments ["end"][0]
-            endpoint = f"/phenotype/region/homo_sapiens/{chromosome}:{start}-{end}"
-            gene_info = connect_server(endpoint)
-            list_of_genes = []
-            for gene in gene_info:
-                gene_name = gene["id"]
-                list_of_genes.append(gene_name)
+            if "chromo" not in arguments or "start" not in arguments or "end" not in arguments:
+                contents = Path("error.html").read_text()
+            else:
+                chromosome = arguments["chromo"][0]
+                start = arguments["start"][0]
+                end = arguments ["end"][0]
+                try:
+                    endpoint = f"/phenotype/region/homo_sapiens/{chromosome}:{start}-{end}"
+                    gene_info = connect_server(endpoint)
+                    list_of_genes = []
+                    for gene in gene_info:
+                        gene_name = gene["id"]
+                        list_of_genes.append(gene_name)
 
-            dic_info = {"user_chromo": chromosome, "start_position": start, "end_position": end, "list_of_genes": list_of_genes}
+                    dic_info = {"user_chromo": chromosome, "start_position": start, "end_position": end, "list_of_genes": list_of_genes}
 
-            contents = read_html_file("gene_list.html").render(
-                context= dic_info)
+                    contents = read_html_file("gene_list.html").render(
+                        context= dic_info)
+                except Exception:
+                    contents = Path("error.html").read_text()
+
+
 
         else:
             contents = Path("error.html").read_text()
