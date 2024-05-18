@@ -14,23 +14,27 @@ import urllib.parse
 
 # Define the Server's port
 PORT = 8080
+
+
 def read_html_file(filename):
     contents = Path("html/" + filename).read_text()
     contents = j.Template(contents)
     return contents
+
+
 def connect_server(ENDPOINT):
-    SERVER = "rest.ensembl.org"
+    server = "rest.ensembl.org"
 
-    PARAMETERS = "?content-type=application/json"
+    parameters = "?content-type=application/json"
 
-    url = ENDPOINT + PARAMETERS
-    URL = SERVER + url
-    print(URL)
+    url = ENDPOINT + parameters
+    url1 = server + url
+    print(url1)
     print()
-    print(f"Server: {SERVER}")
+    print(f"Server: {server}")
     print(f"URL: {url}")
 
-    conn = http.client.HTTPConnection(SERVER)
+    conn = http.client.HTTPConnection(server)
 
     # -- Send the request message, using the GET method. We are
     # -- requesting the main page (/)
@@ -55,6 +59,7 @@ def connect_server(ENDPOINT):
 
     return person
 
+
 def info_response(msg):
     s1 = Seq(str(msg))
     length = s1.len()
@@ -62,21 +67,32 @@ def info_response(msg):
 
     total_bases = sum(base_counts.values())
 
-    info_list = [f"Length: {length}"]
+    info_list = [f"The length of the gene is: {length}"]
     for base, count in base_counts.items():
         percentage = round(count / total_bases * 100, 1)
-        info_list.append(f"{base}: {count} ({percentage}%)")
+        info_list.append(f"The percentage of {base} is: {count} ({percentage}%)")
 
     return info_list
 
 
+def check_specie(specie):
+    endpoint = "/info/species"
+    total_list = connect_server(endpoint)
+
+    specie = specie.lower()
+
+    for i in total_list["species"]:
+        if specie in i["common_name"].lower():
+            return True
+
+    return False
 
 
 # -- This is for preventing the error: "Port already in use"
 socketserver.TCPServer.allow_reuse_address = True
+
+
 class TestHandler(http.server.BaseHTTPRequestHandler):
-
-
     def do_GET(self):
         """This method is called whenever the client invokes the GET method
         in the HTTP protocol request"""
@@ -102,103 +118,142 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             else:
                 limit = arguments["limit"][0]
 
-            list_species = []
-            for specie in total_list["species"][:int(limit)]:
-                n = (specie["common_name"]).capitalize()
-                list_species.append(n)
-            contents = read_html_file("list-species.html").render(
-                context={"limit_number": limit, "total_number": total_species, "list_species": list_species})
+            if int(limit) <= total_species:
+                list_species = []
+                for specie in total_list["species"][:int(limit)]:
+                    n = (specie["common_name"]).capitalize()
+                    list_species.append(n)
+                contents = read_html_file("list-species.html").render(
+                    context={"limit_number": limit, "total_number": total_species, "list_species": list_species})
 
-
-
+            else:
+                contents = Path("error.html").read_text()
 
         elif path == "/karyotype":
 
             specie = arguments["species"][0].replace("+", "").strip()
             specie1 = urllib.parse.quote(specie)
-            ENDPOINT = "/info/assembly/" + specie1
 
-            specie_list = connect_server(ENDPOINT)
+            specie_found = check_specie(specie)
 
-            karyotype_list = (specie_list["karyotype"])
+            if not specie_found:
+                contents = Path("error.html").read_text()
+            else:
+                endpoint1 = "/info/assembly/" + specie1
 
-            contents = read_html_file("karyotype.html").render(
-                context={"names_karyotype": karyotype_list})
+                specie_list = connect_server(endpoint1)
 
+                karyotype_list = (specie_list["karyotype"])
+
+                contents = read_html_file("karyotype.html").render(
+                    context={"names_karyotype": karyotype_list})
 
         elif path == "/chromosomeLength":
-            specie = arguments["species"][0].replace("+", "").lower().strip()
-            number_chromosome = arguments["chromo"][0]
-            ENDPOINT1 = "/info/assembly/"
-            ENDPOINT_COMPLETE = ENDPOINT1 + urllib.parse.quote(specie)
-            total_list = connect_server(ENDPOINT_COMPLETE)
 
-            for j in total_list["top_level_region"]:
-                if j["name"] == number_chromosome and j["coord_system"] == "chromosome":
-                    chromosome_length = j["length"]
+            if "species" not in arguments or "chromo" not in arguments:
+                contents = Path("error.html").read_text()
 
-            contents = read_html_file("chromosome_length.html").render(
-                context={"chromosome_length": chromosome_length})
+            else:
+                specie = arguments["species"][0].replace("+", "").lower().strip()
+                number_chromosome = arguments["chromo"][0]
+                endpoint1 = "/info/assembly/"
+                endpoint_complete = endpoint1 + urllib.parse.quote(specie)
+                total_list = connect_server(endpoint_complete)
+                specie_found = check_specie(specie)
+                if not specie_found:
+                    contents = Path("error.html").read_text()
+                else:
+                    chromosome_length = None
+                    for j in total_list["top_level_region"]:
+                        if j["name"] == number_chromosome and j["coord_system"] == "chromosome":
+                            chromosome_length = j["length"]
+                            break
+
+                    if chromosome_length is not None:
+                        contents = read_html_file("chromosome_length.html").render(
+                            context={"chromosome_length": chromosome_length})
+
+                    else:
+                        contents = Path("error.html").read_text()  # Error si el número de cromosoma no es válido
 
         elif path == "/geneSeq":
-            name_gene = arguments["gene"][0]
+            name_gene = arguments["gene"][0].upper()
             print(name_gene)
-            ENDPOINT = "/lookup/symbol/human/" + str(name_gene)
-            gene_info = connect_server(ENDPOINT)
-            id = gene_info["id"]
-            ENDPOINT1 = "/sequence/id/" + str(id)
-            gene_sequence = connect_server(ENDPOINT1)
-            sequence = gene_sequence["seq"]
-            contents = read_html_file("gene_sequence.html").render(
-                context={"user_gene": name_gene, "sequence": sequence})
+            try:
+                endpoint = "/lookup/symbol/human/" + str(name_gene)
+                gene_info = connect_server(endpoint)
+                id_number = gene_info["id"]
+                endpoint1 = "/sequence/id/" + str(id_number)
+                gene_sequence = connect_server(endpoint1)
+                sequence = gene_sequence["seq"]
+                contents = read_html_file("gene_sequence.html").render(
+                    context={"user_gene": name_gene, "sequence": sequence})
+
+            except Exception:
+                contents = Path("error.html").read_text()
 
         elif path == "/geneInfo":
-            name_gene = arguments["gene"][0]
-            ENDPOINT = "/lookup/symbol/human/" + str(name_gene)
-            gene_info = connect_server(ENDPOINT)
-            start = gene_info["start"]
-            end = gene_info["end"]
-            id = gene_info["id"]
-            ENDPOINT1 = "/sequence/id/" + str(id)
-            gene_sequence = connect_server(ENDPOINT1)
-            sequence = gene_sequence["seq"]
-            length = len(str(sequence))
-            chromosome_info = gene_sequence["desc"]
-            chromosome_info= str(chromosome_info).split(":")
-            chromosome_number = chromosome_info[2]
-            contents = read_html_file("gene_info.html").render(
-                context={"user_gene": name_gene, "start": start, "end": end, "id":id, "chromosome" : chromosome_number, "length": length})
+            try:
+                name_gene = arguments["gene"][0]
+                endpoint = "/lookup/symbol/human/" + str(name_gene)
+                gene_info = connect_server(endpoint)
+                start = gene_info["start"]
+                end = gene_info["end"]
+                id_number = gene_info["id"]
+                endpoint1 = "/sequence/id/" + str(id_number)
+                gene_sequence = connect_server(endpoint1)
+                sequence = gene_sequence["seq"]
+                length = len(str(sequence))
+                chromo_info = gene_sequence["desc"]
+                chromo_info= str(chromo_info).split(":")
+                chromo_number = chromo_info[2]
+                contents = read_html_file("gene_info.html").render(
+                    context={"user_gene": name_gene, "start": start, "end": end, "id": id_number, "chromosome" : chromo_number, "length": length})
+
+            except Exception:
+                contents = Path("error.html").read_text()
 
         elif path == "/geneCalc":
-            name_gene = arguments["gene"][0]
-            ENDPOINT = "/lookup/symbol/human/" + str(name_gene)
-            gene_info = connect_server(ENDPOINT)
-            id = gene_info["id"]
-            ENDPOINT1 = "/sequence/id/" + str(id)
-            gene_sequence = connect_server(ENDPOINT1)
-            sequence = gene_sequence["seq"]
-            calc_gene = info_response(str(sequence))
-            print(calc_gene)
-            length = len(str(sequence))
-            contents = read_html_file("calculation_gene.html").render(
-                context={"user_gene": name_gene, "bases": calc_gene,
-                         "length": length})
+            try:
+                name_gene = arguments["gene"][0]
+                endpoint = "/lookup/symbol/human/" + str(name_gene)
+                gene_info = connect_server(endpoint)
+                id_number = gene_info["id"]
+                endpoint1 = "/sequence/id/" + str(id_number)
+                gene_sequence = connect_server(endpoint1)
+                sequence = gene_sequence["seq"]
+                calc_gene = info_response(str(sequence))
+                print(calc_gene)
+                length = len(str(sequence))
+                contents = read_html_file("calculation_gene.html").render(
+                    context={"user_gene": name_gene, "bases": calc_gene, "length": length})
+
+            except Exception:
+                contents = Path("error.html").read_text()
 
         elif path == "/geneList":
-            chromosome = arguments["chromo"][0]
-            start = arguments["start"][0]
-            end = arguments ["end"][0]
-            endpoint = f"/phenotype/region/homo_sapiens/{chromosome}:{start}-{end}"
-            gene_info = connect_server(endpoint)
-            list_of_genes = []
-            for gene in gene_info:
-                gene_name = gene["id"]
-                list_of_genes.append(gene_name)
+            if "chromo" not in arguments or "start" not in arguments or "end" not in arguments:
+                contents = Path("error.html").read_text()
+            else:
+                chromosome = arguments["chromo"][0]
+                start = arguments["start"][0]
+                end = arguments ["end"][0]
+                try:
+                    endpoint = f"/phenotype/region/homo_sapiens/{chromosome}:{start}-{end}"
+                    gene_info = connect_server(endpoint)
+                    list_of_genes = []
+                    for gene in gene_info:
+                        gene_name = gene["id"]
+                        list_of_genes.append(gene_name)
 
-            dic_info = {"user_chromo": chromosome, "start_position": start, "end_position": end, "list_of_genes": list_of_genes}
+                    dic_info = {"user_chromo": chromosome, "start_position": start, "end_position": end, "list_of_genes": list_of_genes}
 
-            contents = read_html_file("gene_list.html").render(
-                context= dic_info)
+                    contents = read_html_file("gene_list.html").render(
+                        context=dic_info)
+                except Exception:
+                    contents = Path("error.html").read_text()
+
+
 
         else:
             contents = Path("error.html").read_text()
@@ -244,4 +299,3 @@ with socketserver.TCPServer(("", PORT), Handler) as httpd:
         print("")
         print("Stopped by the user")
         httpd.server_close()
-
