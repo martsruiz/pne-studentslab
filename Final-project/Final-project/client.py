@@ -47,8 +47,6 @@ elif user_request == "7":
 else:
     print("Sorry, we have an error")
 
-
-
 try:
     conn.request("GET", request)
 except ConnectionRefusedError:

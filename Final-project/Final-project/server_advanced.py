@@ -15,7 +15,6 @@ import urllib.parse
 # Define the Server's port
 PORT = 8080
 
-
 def read_html_file(filename):
     contents = Path("html/" + filename).read_text()
     contents = j.Template(contents)

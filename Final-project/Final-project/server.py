@@ -11,7 +11,6 @@ import jinja2 as j
 from Seq1 import Seq
 import urllib.parse
 
-
 # Define the Server's port
 PORT = 8080
 
