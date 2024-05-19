@@ -113,10 +113,12 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             total_list = connect_server(ENDPOINT)
             total_species = len(total_list["species"])
 
-            if arguments == {}:
-                limit = int(total_species)
-            else:
-                limit = arguments["limit"][0]
+            limit = total_species
+            if "limit" in arguments:
+                try:
+                    limit = int(arguments["limit"][0])
+                except (ValueError, IndexError):
+                    pass
 
             if int(limit) <= total_species:
                 list_species = []
@@ -130,23 +132,27 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 contents = Path("error.html").read_text()
 
         elif path == "/karyotype":
+            try:
+                specie = arguments["species"][0].replace("+", "").strip()
+                specie1 = urllib.parse.quote(specie)
 
-            specie = arguments["species"][0].replace("+", "").strip()
-            specie1 = urllib.parse.quote(specie)
+                specie_found = check_specie(specie)
 
-            specie_found = check_specie(specie)
+                if not specie_found:
+                    contents = Path("error.html").read_text()
+                else:
+                    endpoint1 = "/info/assembly/" + specie1
 
-            if not specie_found:
+                    specie_list = connect_server(endpoint1)
+
+                    karyotype_list = (specie_list["karyotype"])
+
+                    contents = read_html_file("karyotype.html").render(
+                        context={"names_karyotype": karyotype_list})
+            except Exception:
                 contents = Path("error.html").read_text()
-            else:
-                endpoint1 = "/info/assembly/" + specie1
 
-                specie_list = connect_server(endpoint1)
 
-                karyotype_list = (specie_list["karyotype"])
-
-                contents = read_html_file("karyotype.html").render(
-                    context={"names_karyotype": karyotype_list})
 
         elif path == "/chromosomeLength":
 
@@ -177,9 +183,10 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                         contents = Path("error.html").read_text()  # Error si el número de cromosoma no es válido
 
         elif path == "/geneSeq":
-            name_gene = arguments["gene"][0].upper()
-            print(name_gene)
             try:
+                name_gene = arguments["gene"][0].upper()
+                print(name_gene)
+
                 endpoint = "/lookup/symbol/human/" + str(name_gene)
                 gene_info = connect_server(endpoint)
                 id_number = gene_info["id"]

@@ -113,7 +113,10 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
         contents = ""
         if path == "/":
-            contents = Path("index.html").read_text()
+            if json_arguments == 0:
+                contents = Path("index.html").read_text()
+            elif json_arguments == 1:
+                contents = json.dumps("Hola")
 
         elif path == "/listSpecies":
             ENDPOINT = "/info/species"
@@ -125,7 +128,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 try:
                     limit = int(arguments["limit"][0])
                 except (ValueError, IndexError):
-                    pass
+                    limit = int(total_species)
 
             if int(limit) <= total_species:
                 list_species = []
@@ -148,28 +151,31 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
 
         elif path == "/karyotype":
+            try:
+                specie = arguments["species"][0].replace("+", "").strip()
+                specie1 = urllib.parse.quote(specie)
 
-            specie = arguments["species"][0].replace("+", "").strip()
-            specie1 = urllib.parse.quote(specie)
+                specie_found = check_specie(specie)
 
-            specie_found = check_specie(specie)
+                if not specie_found:
+                    contents = Path("error.html").read_text()
+                else:
+                    endpoint1 = "/info/assembly/" + specie1
 
-            if not specie_found:
+                    specie_list = connect_server(endpoint1)
+
+                    karyotype_list = (specie_list["karyotype"])
+
+                    info ={"names_karyotype": karyotype_list}
+
+                    if json_arguments == 0:
+                        contents = read_html_file("karyotype.html").render(
+                        context=info)
+                    elif json_arguments == 1:
+                        contents = json.dumps(info)
+
+            except Exception:
                 contents = Path("error.html").read_text()
-            else:
-                endpoint1 = "/info/assembly/" + specie1
-
-                specie_list = connect_server(endpoint1)
-
-                karyotype_list = (specie_list["karyotype"])
-
-                info ={"names_karyotype": karyotype_list}
-
-                if json_arguments == 0:
-                    contents = read_html_file("karyotype.html").render(
-                    context=info)
-                elif json_arguments == 1:
-                    contents = json.dumps(info)
 
         elif path == "/chromosomeLength":
 
@@ -183,6 +189,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 endpoint_complete = endpoint1 + urllib.parse.quote(specie)
                 total_list = connect_server(endpoint_complete)
                 specie_found = check_specie(specie)
+
                 if not specie_found:
                     contents = Path("error.html").read_text()
                 else:
@@ -193,31 +200,42 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                             break
 
                     if chromosome_length is not None:
-                        contents = read_html_file("chromosome_length.html").render(
-                            context={"chromosome_length": chromosome_length})
+                        info = {"chromosome_length": chromosome_length}
+                        if json_arguments == 0:
+                            contents = read_html_file("chromosome_length.html").render(
+                                context=info)
+                        elif json_arguments == 1:
+                            contents = json.dumps(info)
+
 
                     else:
                         contents = Path("error.html").read_text()  # Error si el número de cromosoma no es válido
 
         elif path == "/geneSeq":
-            name_gene = arguments["gene"][0].upper()
-            print(name_gene)
             try:
+                name_gene = arguments["gene"][0].upper()
+                print(name_gene)
+
                 endpoint = "/lookup/symbol/human/" + str(name_gene)
                 gene_info = connect_server(endpoint)
                 id_number = gene_info["id"]
                 endpoint1 = "/sequence/id/" + str(id_number)
                 gene_sequence = connect_server(endpoint1)
                 sequence = gene_sequence["seq"]
-                contents = read_html_file("gene_sequence.html").render(
-                    context={"user_gene": name_gene, "sequence": sequence})
+                info = {"user_gene": name_gene, "sequence": sequence}
+
+                if json_arguments == 0:
+                    contents = read_html_file("gene_sequence.html").render(
+                        context=info)
+                elif json_arguments == 1:
+                    contents = json.dumps(info)
 
             except Exception:
                 contents = Path("error.html").read_text()
 
         elif path == "/geneInfo":
             try:
-                name_gene = arguments["gene"][0]
+                name_gene = arguments["gene"][0].upper()
                 endpoint = "/lookup/symbol/human/" + str(name_gene)
                 gene_info = connect_server(endpoint)
                 start = gene_info["start"]
@@ -230,8 +248,12 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 chromo_info = gene_sequence["desc"]
                 chromo_info= str(chromo_info).split(":")
                 chromo_number = chromo_info[2]
-                contents = read_html_file("gene_info.html").render(
-                    context={"user_gene": name_gene, "start": start, "end": end, "id": id_number, "chromosome" : chromo_number, "length": length})
+                info = {"user_gene": name_gene, "start": start, "end": end, "id": id_number, "chromosome" : chromo_number, "length": length}
+                if json_arguments == 0:
+                    contents = read_html_file("gene_info.html").render(
+                        context=info)
+                elif json_arguments == 1:
+                    contents = json.dumps(info)
 
             except Exception:
                 contents = Path("error.html").read_text()
@@ -246,10 +268,14 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 gene_sequence = connect_server(endpoint1)
                 sequence = gene_sequence["seq"]
                 calc_gene = info_response(str(sequence))
-                print(calc_gene)
                 length = len(str(sequence))
-                contents = read_html_file("calculation_gene.html").render(
-                    context={"user_gene": name_gene, "bases": calc_gene, "length": length})
+
+                info = {"user_gene": name_gene, "bases": calc_gene, "length": length}
+                if json_arguments == 0:
+                    contents = read_html_file("calculation_gene.html").render(
+                        context=info)
+                elif json_arguments == 1:
+                    contents = json.dumps(info)
 
             except Exception:
                 contents = Path("error.html").read_text()
@@ -269,44 +295,56 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                         gene_name = gene["id"]
                         list_of_genes.append(gene_name)
 
-                    dic_info = {"user_chromo": chromosome, "start_position": start, "end_position": end, "list_of_genes": list_of_genes}
+                    info = {"user_chromo": chromosome, "start_position": start, "end_position": end, "list_of_genes": list_of_genes}
 
-                    contents = read_html_file("gene_list.html").render(
-                        context=dic_info)
+                    if json_arguments == 0:
+                        contents = read_html_file("gene_list.html").render(
+                            context=info)
+                    elif json_arguments == 1:
+                        contents = json.dumps(info)
+
                 except Exception:
                     contents = Path("error.html").read_text()
-
-
 
         else:
             contents = Path("error.html").read_text()
 
+        if json_arguments == 0:
+
+            # Generating the response message
+            self.send_response(200)  # -- Status line: OK!
+
+            # Define the content-type header:
+            self.send_header('Content-Type', 'text/html')
+            self.send_header('Content-Length', len(str.encode(contents)))
+
+            # The header is finished
+            self.end_headers()
+
+            # Send the response message
+            self.wfile.write(str.encode(contents))
+
+        elif json_arguments == 1:
+            self.send_response(200)  # -- Status line: OK!
+
+            # Define the content-type header:
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', len(str.encode(contents)))
+
+            # The header is finished
+            self.end_headers()
+
+            # Send the response message
+            self.wfile.write(str.encode(contents))
 
 
 
 
 
 
-        # Generating the response message
-        self.send_response(200)  # -- Status line: OK!
-
-        # Define the content-type header:
-        self.send_header('Content-Type', 'text/html')
-        self.send_header('Content-Length', len(str.encode(contents)))
-
-        # The header is finished
-        self.end_headers()
-
-        # Send the response message
-        self.wfile.write(str.encode(contents))
 
 
 
-
-    # ------------------------
-    # - Server MAIN program
-    # ------------------------
-    # -- Set the new handler
 Handler = TestHandler
 
 # -- Open the socket server
