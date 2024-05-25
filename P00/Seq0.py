@@ -39,6 +39,7 @@ def seq_reverse(seq, n):
 
     return short_sequence
 
+
 def seq_complement(seq) :
     short_sequence = seq_reverse(seq, 20)
     dic = {"A": "T",

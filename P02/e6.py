@@ -11,9 +11,9 @@ sequence = "../sequences/"
 print(f"-----| Practice {PRACTICE}, Exercise {EXERCISE} |------")
 
 # -- Parameters of the server to talk to
-IP = "212.128.255.30"  #"212.128.255.90" # your IP address
+IP = "127.0.0.1"  #"212.128.255.90" # your IP address
 PORT = 8080
-IP2 = "212.128.255.30"
+IP2 = "127.0.0.1"
 PORT2 = 8081
 def get_sequence(gene):
     file_path = sequence + gene + ".txt"

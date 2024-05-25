@@ -2,7 +2,7 @@ import socket
 
 # SERVER IP, PORT
 PORT = 1234
-IP = "212.128.255.30"#  depends on the computer the server is running tiene que ser el ID del ordenador al que queremos mandar
+IP = "127.0.0.1"#  depends on the computer the server is running tiene que ser el ID del ordenador al que queremos mandar
 ok = True
 while ok:
   # -- Ask the user for the message
