@@ -27,7 +27,7 @@ def connect_server(ENDPOINT):
     parameters = "?content-type=application/json"
 
     url = ENDPOINT + parameters
-    url1 = server + url
+    url1 = server + url #url completo
     print(url1)
     print()
     print(f"Server: {server}")
