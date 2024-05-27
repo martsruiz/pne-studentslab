@@ -30,7 +30,7 @@ def print_seqs(seq_list):
 
 def generate_seqs(pattern, number):
     seq_list = []
-    for i in range(1, number +1):
+    for i in range(1, number + 1):
         seq_list.append(Seq(pattern * i))
     return seq_list
 

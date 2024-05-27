@@ -7,6 +7,7 @@ class Seq:
                 strbases = "ERROR"
             else:
                 pass
+
         if strbases == "ERROR":
             print("ERROR!!")
         else:
